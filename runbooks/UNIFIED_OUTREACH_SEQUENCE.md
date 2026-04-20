@@ -93,7 +93,15 @@ These phrases scream "AI-generated cold email." Never use them as openers:
 
 ### Sender Variable
 
-All email AND LinkedIn message bodies MUST use `{{sender_first_name}}` as the sign-off, never hardcoded names. This includes CEO/Founder LinkedIn messages (custom_linkedin3) - use `{{sender_first_name}} from Finmo`, NOT "David from Finmo" or "David Hanna from Finmo". Exception: Email 1 may be left unsigned (raw hypothesis, no sign-off).
+All email, LinkedIn, AND WhatsApp bodies MUST use `{{sender_first_name}}` everywhere a sender name appears. This includes:
+- Email sign-offs (end of body)
+- CEO/Founder LinkedIn messages (custom_linkedin3)
+- CEO/Founder WhatsApp messages (whatsapp_ceo_1)
+- CEO email bodies (email9_body, email10_body) - both inline mentions AND sign-offs
+
+**Never hardcode** "David", "David Hanna", "David from Finmo", "David here, CEO", "it's David (CEO)", etc. Always use `{{sender_first_name}}`.
+
+Exception: Email 1 may be left unsigned (raw hypothesis, no sign-off).
 
 ### Respectful Opt-Out
 
