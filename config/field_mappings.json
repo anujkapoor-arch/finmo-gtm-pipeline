@@ -1,0 +1,123 @@
+{
+  "_comment": "Field mappings between JSON lead data, Airtable, HubSpot, and SmartReach",
+
+  "airtable_fields": {
+    "research": [
+      "Company Name", "Website", "Company LinkedIn", "Industry", "Team Size",
+      "HQ Location", "Office Locations", "Countries", "Currencies",
+      "Business Model", "Revenue", "Growth Signals"
+    ],
+    "contact": [
+      "Contact Name", "Contact Title", "Contact LinkedIn", "Contact Email",
+      "Contact Phone", "Person Country"
+    ],
+    "scoring": [
+      "Lead Score", "ICP Fit", "Timing Score", "Cash Risk Score", "Priority"
+    ],
+    "assignment": [
+      "SDR Owner", "AE Owner", "Timezone", "Date Added"
+    ],
+    "research_notes": [
+      "Outreach Angle", "Pain Points", "Finance Setup",
+      "Cash Timing Risk", "Key Signals"
+    ],
+    "sdr_content": [
+      "custom_subject1", "custom_email1", "custom_email2",
+      "custom_email3", "custom_email4",
+      "custom_linkedin_cr", "custom_linkedin1",
+      "custom_linkedin2", "custom_linkedin3", "custom_linkedin4"
+    ],
+    "ae_content": [
+      "email5_subject", "email5_body",
+      "email6_subject", "email6_body",
+      "email7_subject", "email7_body",
+      "email8_subject", "email8_body"
+    ],
+    "ceo_content": [
+      "email9_subject", "email9_body",
+      "email10_subject", "email10_body"
+    ],
+    "whatsapp_content": [
+      "whatsapp_sdr_1", "whatsapp_sdr_2",
+      "whatsapp_ae_1", "whatsapp_ae_2",
+      "whatsapp_ceo_1", "whatsapp_ceo_2", "whatsapp_ceo_3"
+    ],
+    "engagement_tracking": [
+      "Pushed to Smartreach", "Prospect Category", "Current Step",
+      "Last Contacted At", "Last Replied At", "Last Opened At",
+      "Email Opens", "Email Link Clicks",
+      "Last Call Made", "Number of Calls", "Call Status",
+      "HubSpot Contact URL", "HubSpot Lead Status",
+      "Lost Reason Explanation", "Reply Sentiment", "Reply Response"
+    ]
+  },
+
+  "new_fields_to_create": [
+    {"name": "AE Owner", "type": "singleSelect", "options": {"choices": [
+      {"name": "Michelle"}, {"name": "Adlin"}, {"name": "Nouvelle"},
+      {"name": "Justin"}, {"name": "Elross"}, {"name": "Gibson"}, {"name": "Yan Ling"}
+    ]}},
+    {"name": "email5_subject", "type": "singleLineText"},
+    {"name": "email5_body", "type": "multilineText"},
+    {"name": "email6_subject", "type": "singleLineText"},
+    {"name": "email6_body", "type": "multilineText"},
+    {"name": "email7_subject", "type": "singleLineText"},
+    {"name": "email7_body", "type": "multilineText"},
+    {"name": "email8_subject", "type": "singleLineText"},
+    {"name": "email8_body", "type": "multilineText"},
+    {"name": "email9_subject", "type": "singleLineText"},
+    {"name": "email9_body", "type": "multilineText"},
+    {"name": "email10_subject", "type": "singleLineText"},
+    {"name": "email10_body", "type": "multilineText"},
+    {"name": "whatsapp_sdr_1", "type": "multilineText"},
+    {"name": "whatsapp_sdr_2", "type": "multilineText"},
+    {"name": "whatsapp_ae_1", "type": "multilineText"},
+    {"name": "whatsapp_ae_2", "type": "multilineText"},
+    {"name": "whatsapp_ceo_1", "type": "multilineText"},
+    {"name": "whatsapp_ceo_2", "type": "multilineText"},
+    {"name": "whatsapp_ceo_3", "type": "multilineText"}
+  ],
+
+  "fields_to_remove": ["Lead Category"],
+
+  "hubspot_property_map": {
+    "firstname": "split_name(Contact Name)[0]",
+    "lastname": "split_name(Contact Name)[1]",
+    "email": "Contact Email",
+    "jobtitle": "Contact Title",
+    "company": "Company Name",
+    "website": "Website",
+    "linkedin_profile_url": "Contact LinkedIn",
+    "city": "parse_location(HQ Location).city",
+    "state": "parse_location(HQ Location).state",
+    "country": "Countries",
+    "hubspot_owner_id": "owners.hubspot_owner_ids[SDR Owner]",
+    "company_size": "Team Size",
+    "hs_timezone": "timezones[region]",
+    "hs_linkedin_url": "Company LinkedIn",
+    "mql_type": "TOFU",
+    "marketing_notes": "build_research_notes(lead)"
+  },
+
+  "smartreach_prospect_map": {
+    "email": "Contact Email",
+    "first_name": "split_name(Contact Name)[0]",
+    "last_name": "split_name(Contact Name)[1]",
+    "company": "Company Name",
+    "designation": "Contact Title",
+    "city": "parse_location(HQ Location).city",
+    "linkedin_url": "Contact LinkedIn",
+    "custom_fields": {
+      "custom_subject1": "custom_subject1",
+      "custom_email1": "custom_email1",
+      "custom_email2": "custom_email2",
+      "custom_email3": "custom_email3",
+      "custom_email4": "custom_email4",
+      "custom_linkedin_cr": "custom_linkedin_cr",
+      "custom_linkedin1": "custom_linkedin1",
+      "custom_linkedin2": "custom_linkedin2",
+      "custom_linkedin3": "custom_linkedin3",
+      "custom_linkedin4": "custom_linkedin4"
+    }
+  }
+}

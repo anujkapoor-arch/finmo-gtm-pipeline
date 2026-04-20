@@ -1,0 +1,71 @@
+{
+  "_comment": "Copy to config.json and fill in values before each run",
+
+  "batch": {
+    "name": "leadgen3_au",
+    "region": "AU",
+    "description": "Lead Gen 3.0 AU leads - April 2026",
+    "dry_run": true
+  },
+
+  "input": {
+    "leads_file": "AU_LEADS_OUTREACH_v2.json",
+    "content_file": null
+  },
+
+  "airtable": {
+    "pat": "YOUR_AIRTABLE_PAT_HERE",
+    "base_id": "YOUR_AIRTABLE_BASE_ID",
+    "table_ids": {
+      "AU": "YOUR_AU_TABLE_ID",
+      "SG": "YOUR_SG_TABLE_ID",
+      "PH": "YOUR_PH_TABLE_ID",
+      "Other": "YOUR_OTHER_TABLE_ID"
+    },
+    "target_table": "AU"
+  },
+
+  "hubspot": {
+    "token": "YOUR_HUBSPOT_PAT_HERE",
+    "portal_id": "YOUR_PORTAL_ID"
+  },
+
+  "smartreach": {
+    "api_key": "YOUR_SMARTREACH_API_KEY",
+    "team_id": "team_YOUR_TEAM_HERE",
+    "campaign_ids": {
+      "Harini": null,
+      "Sukriti": null
+    }
+  },
+
+  "owners": {
+    "sdrs": ["Harini", "Sukriti"],
+    "aes": ["Michelle", "Adlin", "Nouvelle", "Justin", "Elross", "Gibson", "Yan Ling"],
+    "ceo": "David",
+    "sdr_assignment": "round-robin",
+    "ae_assignment": "round-robin",
+    "hubspot_owner_ids": {
+      "Harini": "YOUR_HUBSPOT_OWNER_ID",
+      "Sukriti": "YOUR_HUBSPOT_OWNER_ID",
+      "Michelle": null,
+      "Adlin": null,
+      "Nouvelle": null,
+      "Justin": null,
+      "Elross": null,
+      "Gibson": null,
+      "Yan Ling": null
+    }
+  },
+
+  "timezones": {
+    "AU": "Australia/Sydney",
+    "SG": "Asia/Singapore",
+    "PH": "Asia/Manila",
+    "Other": "UTC"
+  },
+
+  "slack": {
+    "webhook_url": null
+  }
+}
