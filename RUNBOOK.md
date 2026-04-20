@@ -404,6 +404,14 @@ To activate PH Leads or Other Regions in the automation:
 
 ## Troubleshooting
 
+### Duplicate Records After Push
+If research and content were pushed in separate runs, company names may differ (e.g., "Simba Global Pty Ltd" vs "Simba Global") creating duplicates. Also watch for contact name variants ("Timothy Bartholomew CA/CPA" vs "Timothy Bartholomew"). After any push:
+1. Check for duplicates: group records by normalized contact name
+2. Keep the record with the higher Lead Score (the research record)
+3. Merge content fields from the duplicate into the keeper
+4. Delete the duplicate
+The push scripts match by Contact Email first, then company name. If neither matches, a new record is created.
+
 ### Airtable 422 "Invalid value for column"
 - Check field type matches value (e.g., Priority must be HIGH/MEDIUM/NURTURE, not P1/P2)
 - Check singleSelect fields have the choice defined

@@ -93,7 +93,7 @@ These phrases scream "AI-generated cold email." Never use them as openers:
 
 ### Sender Variable
 
-All email bodies MUST use `{{sender_first_name}}` as the sign-off, never hardcoded names. Exception: Email 1 may be left unsigned (raw hypothesis, no sign-off).
+All email AND LinkedIn message bodies MUST use `{{sender_first_name}}` as the sign-off, never hardcoded names. This includes CEO/Founder LinkedIn messages (custom_linkedin3) - use `{{sender_first_name}} from Finmo`, NOT "David from Finmo" or "David Hanna from Finmo". Exception: Email 1 may be left unsigned (raw hypothesis, no sign-off).
 
 ### Respectful Opt-Out
 
@@ -627,7 +627,7 @@ Happy to share how we've helped similar setups if useful. No pressure either way
 ### Day 35: LinkedIn Message 3 (Final)
 
 ```
-[First Name] - [CEO Name] here from Finmo. My team has been following [their company] for a while. Your [specific detail] is impressive. Would love to connect and compare notes on how treasury and payments are converging for [companies their size/type].
+[First Name] - {{sender_first_name}} from Finmo. My team has been following [their company] for a while. Your [specific detail] is impressive. Would love to connect and compare notes on how treasury and payments are converging for [companies their size/type].
 ```
 
 ---
@@ -678,7 +678,7 @@ Before any content ships, verify:
 - [ ] One question OR one CTA per message (not both)
 - [ ] No banned words (see list above)
 - [ ] No em dashes, no emojis, no "Best,/Cheers,/Regards,"
-- [ ] `{{sender_first_name}}` used for all sign-offs (no hardcoded names)
+- [ ] `{{sender_first_name}}` used for all sign-offs AND LinkedIn messages (no hardcoded "David from Finmo")
 - [ ] No opt-out on Email 1 or Email 2
 - [ ] Opt-out on E3+ is separated from body with `<br><br>` and varies per email
 - [ ] LinkedIn CR under 300 characters, uses content-offer template
