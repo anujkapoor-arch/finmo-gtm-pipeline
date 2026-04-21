@@ -93,6 +93,8 @@ These phrases scream "AI-generated cold email." Never use them as openers:
 
 ### Sender Variable
 
+**CRITICAL: `{{sender_first_name}}` is for SIGN-OFFS and SENDER references ONLY.** Never use it in the greeting/salutation line. Greetings must always use the recipient's actual first name (e.g., "Hi David," not "Hi {{sender_first_name}},"). This is a common AI generation error - always verify.
+
 All email, LinkedIn, AND WhatsApp bodies MUST use `{{sender_first_name}}` everywhere a sender name appears. This includes:
 - Email sign-offs (end of body)
 - CEO/Founder LinkedIn messages (custom_linkedin3)
