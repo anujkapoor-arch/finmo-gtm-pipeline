@@ -111,11 +111,42 @@ python3 scripts/pipeline/lg3_create_airtable_fields.py --config config/config.js
 
 | Field | Type | Purpose |
 |-------|------|---------|
-| AE Owner | singleSelect | AE assignment (Michelle, Adlin, Nouvelle, Justin, Elross, Gibson, Yan Ling) |
+| AE Owner | singleSelect | AE assignment (Gibson Saw, Nouvelle Nye, Elross Pangue, Michelle Ling) |
+| ae_linkedin_cr | multilineText | AE LinkedIn Connection Request (separate from SDR CR) |
 | email5_subject - email10_body | singleLineText / multilineText | AE + CEO email content |
 | whatsapp_sdr_1 - whatsapp_ceo_3 | multilineText | WhatsApp message content |
 
+**Total: 21 new fields per table.**
+
 **Manual step:** Remove `Lead Category` field from all 4 tables in Airtable UI (API doesn't support field deletion).
+
+### Timezone
+
+Every prospect MUST have a `Timezone` value. This drives SmartReach campaign send timing.
+
+**Resolution priority:**
+1. **Person Country** field (prospect's actual location, not company HQ)
+2. **HQ Location** fallback (if Person Country is empty)
+3. **First country** in Countries field (last resort)
+
+**Why prospect location, not HQ:** A prospect at Embla Medical (HQ Iceland) who sits in Sydney should get emails at Sydney time, not Reykjavik time.
+
+**Common timezone values:**
+| Region | Timezone |
+|--------|----------|
+| Australia (East) | `Australia/Sydney` |
+| Singapore | `Asia/Singapore` |
+| Philippines | `Asia/Manila` |
+| India | `Asia/Kolkata` |
+| UK / Ireland | `Europe/London` |
+| France / Germany / Switzerland | `Europe/Paris` / `Europe/Berlin` / `Europe/Zurich` |
+| Sweden | `Europe/Stockholm` |
+| US East | `America/New_York` |
+| US Central | `America/Chicago` |
+| US West | `America/Los_Angeles` |
+| Canada (Vancouver) | `America/Vancouver` |
+
+**Verify before campaign launch:** Run a check for empty Timezone fields. Zero gaps required.
 
 ---
 
