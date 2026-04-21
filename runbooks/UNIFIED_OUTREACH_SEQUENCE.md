@@ -651,27 +651,45 @@ Happy to share how we've helped similar setups if useful. No pressure either way
 
 ## Full Sequence Calendar
 
-| Day | Channel | Sender | Formula | Type |
-|-----|---------|--------|---------|------|
-| 1 | Email 1 | SDR | Pain Hypothesis (Style A) | Discovery |
-| 1 | LinkedIn CR | SDR | Content-offer hook | - |
-| 2 | WhatsApp x2 | SDR | "Totally get it if WhatsApp is weird..." | Reference email |
-| 5 | Email 2 | SDR | **BAB (aspiration)** | **Selling** |
-| 7 | LinkedIn Msg 1 | SDR | Observation (no ask) | Seed planting |
-| 10 | Email 3 | SDR | **Referral/Right Person (Style B)** | Social proof |
-| 13 | Email 4 | SDR | Open Door | Zero pressure |
-| 16 | Email 5 | AE | **PAS (pain)** | **Selling** |
-| 17 | WhatsApp x2 | AE | "Apologies for cold WhatsApp..." | Reference SDR + insight |
-| 20 | Email 6 | AE | **Pattern Share** | **Discovery** |
-| 21 | LinkedIn Msg 2 | AE | Market trend | Insight |
-| 22 | Email 7 | AE | **Relevant Question (free tips)** | Value-first |
-| 25 | Email 8 | AE | **Up to You** | Zero pressure |
-| 28 | Email 9 | CEO | Personal reach-out | Relationship |
-| 28 | WhatsApp x3 | CEO | "It's [CEO Name]..." | Personal, 3 bursts |
-| 33 | Email 10 | CEO | Value drop | Insight |
-| 35 | LinkedIn Msg 3 | CEO | Final connection | Open door |
+**LinkedIn CR goes FIRST.** The connection request is the gate. Email starts only after a 7-day buffer to allow acceptance. If not accepted after 7 days, view their profile (triggers a notification) and wait another 7 days before starting email.
 
-**18 touchpoints. 35 days. 3 senders. 3 channels. 8 different formulas. Zero pattern.**
+**Why CR first:** LinkedIn messages only work if connected. Sending emails before knowing if the CR was accepted wastes the LinkedIn channel. By leading with CR, we get 7 days of passive visibility (they see who viewed/requested) before the first email lands.
+
+| Day | Channel | Sender | Formula | What Happens | System |
+|-----|---------|--------|---------|-------------|--------|
+| 0 | **LinkedIn CR** | SDR | Content-offer | Send CR. This is Day 0 - everything else is relative to this. | SmartReach |
+| 7 | **Check** | SDR | - | **If CR accepted:** proceed to Day 8. **If not:** view profile, wait 7 more days. | SmartReach/Manual |
+| 8 | Email 1 | SDR | Pain Hypothesis | First email. They may have seen your profile/CR already. | SmartReach |
+| 9 | WhatsApp x2 | SDR | Intro bursts | "Sent you an email..." | Unipile |
+| 10 | LinkedIn Msg 1 | SDR | Observation (no ask) | Only if CR accepted. Otherwise skip. | SmartReach |
+| 12 | Email 2 | SDR | **BAB (aspiration)** | Selling formula from SDR | SmartReach |
+| 17 | Email 3 | SDR | **Referral/Social Proof** | Different tone | SmartReach |
+| 20 | Email 4 | SDR | Open Door | Zero pressure | SmartReach |
+| 21 | ─── | **SDR DECISION POINT** | ─── | Reply -> AE handoff. No reply + P1/P2 -> escalate to AE. P3 -> stop. | ─── |
+| 23 | Email 5 | AE | **PAS (pain)** | New sender, selling | SmartReach |
+| 24 | WhatsApp x2 | AE | Direct + number | Reference SDR | Unipile |
+| 27 | Email 6 | AE | **Pattern Share** | Discovery from AE | SmartReach |
+| 28 | LinkedIn Msg 2 | AE | Market trend | Only if connected | SmartReach |
+| 29 | Email 7 | AE | **Relevant Question** | Free value | SmartReach |
+| 32 | Email 8 | AE | **Up to You** | Zero pressure | SmartReach |
+| 32 | ─── | **AE DECISION POINT** | ─── | Reply -> demo. No reply + P1 -> escalate to CEO. P2 -> nurture. | ─── |
+| 35 | Email 9 | CEO | **Personal reach-out** | Status signal | SmartReach |
+| 35 | WhatsApp x3 | CEO | Short bursts | Personal | Unipile |
+| 40 | Email 10 | CEO | **Value drop** | Insight | SmartReach |
+| 42 | LinkedIn Msg 3 | CEO | Final connection | Only if connected | SmartReach |
+
+**20 touchpoints. 42 days. 3 senders. 3 channels. LinkedIn CR gates the sequence.**
+
+### LinkedIn CR Not Accepted Flow
+
+If the CR is not accepted after Day 7:
+
+| Day | Action | System |
+|-----|--------|--------|
+| 7 | CR not accepted -> View their profile (triggers LinkedIn notification) | SmartReach/Manual |
+| 14 | Still not accepted -> Start email sequence anyway (Day 8 flow). Skip all LinkedIn message steps. | SmartReach |
+
+The email sequence runs regardless after Day 14 max wait. LinkedIn messages are conditional on connection status.
 
 ---
 
