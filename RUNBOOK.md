@@ -318,10 +318,129 @@ curl -s "https://api.hubapi.com/crm/v3/objects/contacts/search" \
   -d '{"filterGroups":[{"filters":[{"propertyName":"email","operator":"EQ","value":"test@example.com"}]}]}' | python3 -m json.tool
 ```
 
-**Checklist:**
+**Basic Checklist:**
 - [ ] Airtable: Scores populated? Content fields filled? SDR + AE Owner set?
 - [ ] HubSpot: Contact created? marketing_notes has research? Owner assigned?
 - [ ] SmartReach: Prospect created? Custom fields have content? Assigned to campaign?
+
+---
+
+## Phase 4b: Sanity Checks (Run After Every Push)
+
+These checks catch issues discovered during pipeline operations. Run ALL of them before launching any campaign.
+
+### 1. Zero Timezone Gaps
+Every prospect must have a `Timezone` value. SmartReach uses this for send timing.
+```
+Query: Count records where Timezone is empty across all 4 tables.
+Expected: 0 missing.
+Fix: Resolve from Person Country > HQ Location > first Country.
+```
+
+### 2. HubSpot Contact URL Populated
+After pushing to HubSpot, write the HubSpot Contact URL back to Airtable. SDRs use this link to access the contact record before calls.
+```
+Query: Count records where HubSpot Contact URL is empty but Contact Email exists.
+Expected: 0 missing (for records with email).
+Fix: Search HubSpot by email, build URL as https://app.hubspot.com/contacts/{PORTAL_ID}/contact/{HS_ID}.
+```
+
+### 3. HubSpot Contact + Company Owner = SDR
+Both the HubSpot contact owner AND the associated company owner must match the SDR Owner from Airtable. This drives task assignment and reporting.
+```
+Query: Compare HubSpot hubspot_owner_id against Airtable SDR Owner mapping.
+Expected: All match.
+Fix: Batch update HubSpot contact owner, then fetch associated companies and update those too.
+```
+
+### 4. No Duplicate Records
+Research and content pushes can create duplicates if company names differ slightly (e.g., "Simba Global Pty Ltd" vs "Simba Global").
+```
+Query: Group records by normalized Contact Name. Flag groups with 2+ records.
+Expected: 0 duplicates.
+Fix: Keep record with higher Lead Score, merge content fields from duplicate, delete duplicate.
+Watch for: Name variants like "Timothy Bartholomew CA/CPA" vs "Timothy Bartholomew".
+```
+
+### 5. P1/P2 Content Completeness
+Every P1 lead must have SDR (E1-E4) + AE (E5-E8) + CEO (E9-E10) content.
+Every P2 lead must have SDR (E1-E4) + AE (E5-E8) content.
+```
+Query: For each HIGH priority record, check custom_email1, email5_body, email9_body are non-empty.
+Expected: P1 (score 70+) has all three tiers. P2 (score 50-69) has SDR + AE.
+Fix: Regenerate missing content via Claude agent.
+```
+
+### 6. No Hardcoded Sender Names
+`{{sender_first_name}}` must be used for all sender references. Never hardcode "David", "Anuj", "Harini" etc.
+```
+Query: Search all text fields for "David from Finmo", "David here", "it's David", "Anuj from Finmo".
+Expected: 0 matches.
+Fix: Replace with {{sender_first_name}} or {{sender_first_name}} {{sender_last_name}}.
+```
+
+### 7. No {{sender_first_name}} in Greetings
+Greetings must use the recipient's actual first name, never the sender variable.
+```
+Query: Search all email fields for "Hi {{sender_first_name}}".
+Expected: 0 matches.
+Fix: Replace with "Hi [Contact First Name]".
+```
+
+### 8. Correct Sign-Off Format
+SDR emails end with "Cheers," + full name. AE emails end with "Best," + full name. CEO emails end with first name only.
+```
+Query: Check last line of custom_email2-4 contains "Cheers,<br>{{sender_first_name}} {{sender_last_name}}".
+        Check last line of email5-8 contains "Best,<br>{{sender_first_name}} {{sender_last_name}}".
+Expected: All match.
+```
+
+### 9. LinkedIn CR is Non-Salesy
+The LinkedIn Connection Request must NOT contain guide offers, CTAs, or product mentions. The content-offer moves to LinkedIn Msg 1 (post-acceptance).
+```
+Query: Search custom_linkedin_cr for "put together", "guide", "Want me to send", "great to e-meet".
+Expected: 0 matches (old salesy patterns).
+Should contain: "came across", "caught my eye", "Would be great to connect".
+```
+
+### 10. AE LinkedIn CR Exists
+Every record with AE content should also have `ae_linkedin_cr` populated.
+```
+Query: Count records where email5_body exists but ae_linkedin_cr is empty.
+Expected: 0 missing.
+```
+
+### 11. Email Verification (Pre-Campaign)
+Run all emails through Clearout before launching SmartReach campaigns.
+```
+Query: Clearout instant verify on all Contact Email values.
+Expected: 0 invalid/hard-bounce. Flag catch-all domains for monitoring.
+Watch for: Generic emails (info@, support@, hr@) - these should have been enriched or flagged.
+```
+
+### 12. Data Mismatches
+Flag records where email domain doesn't match company (e.g., Wells Fargo email on a BPO company).
+```
+Query: Compare Contact Email domain against Company Name / Website.
+Expected: All match or have documented reason for mismatch.
+Fix: Delete or re-enrich mismatched records.
+```
+
+### 13. SDR + AE Owner Assigned
+Every record with content must have both SDR Owner and AE Owner populated.
+```
+Query: Count records where custom_email1 exists but SDR Owner or AE Owner is empty.
+Expected: 0 missing.
+Valid SDR values: Harini, Sukriti.
+Valid AE values: Gibson Saw, Nouvelle Nye, Elross Pangue, Michelle Ling.
+```
+
+### Quick Sanity Check Script
+Run this after every push to catch all issues at once:
+```bash
+python3 scripts/pipeline/lg3_sanity_check.py --config config/config.json
+```
+*(Script checks all 13 rules above and reports pass/fail with counts.)*
 
 ---
 
