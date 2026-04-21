@@ -265,14 +265,30 @@ Hi [First Name],<br><br>
 
 ---
 
-### Day 1: LinkedIn Connection Request
+### Day 0: LinkedIn Connection Request (SDR)
 
-**Goal:** Get accepted by offering value. Content-offer approach.
+**Goal:** Get accepted. That's it. Zero sales intent visible. Think: you're approaching someone at a conference - you'd say something genuine about their work, not pitch a guide.
 
-**Template:**
+**What NOT to do:**
+- "I put together a guide..." (sales move)
+- "Want me to send it over?" (CTA on a CR = instant ignore)
+- Anything that reveals you want something from them
+
+**SDR CR Template:**
 ```
-Hi [First Name], great to e-meet you! I put together a short guide on how [their company type] running [X]+ currencies handle treasury and payments from one platform instead of three. Thought it might be useful given [Company]'s setup. Want me to send it over?
+Hi [First Name] - came across [Company] while researching [industry/region] finance teams. Your role managing [specific thing about their setup - e.g., "treasury across nine countries"] caught my eye. Would be great to connect.
 ```
+
+**AE CR Template (used when AE sends their own CR in Tier 2):**
+```
+Hi [First Name] - I work with [their role type] at [their company type] across [region]. Your setup at [Company] stood out. Would love to connect and follow your work.
+```
+
+**Rules:**
+- Under 300 characters
+- No product mention, no company name (Finmo), no value prop
+- Just a human who found their work interesting
+- The content-offer moves to LinkedIn Msg 1 (after acceptance)
 
 ---
 
@@ -319,14 +335,16 @@ Worth a quick walkthrough next week?<br><br>
 
 ---
 
-### Day 7: LinkedIn Message 1 - Observation, No Question
+### Day 10: LinkedIn Message 1 - Content Offer (Post-Acceptance)
 
-*Tool Shed variety: plant a seed. No ask.*
+*Only sent if CR was accepted. This is where the guide offer lives - coming from someone they've already agreed to connect with, not a stranger.*
 
 **Template:**
 ```
-[One specific observation about their company's multi-country/multi-currency setup. Connect it to the "three disconnected tools" problem. No question, no CTA. Just a thought that sticks.]
+Thanks for connecting, [First Name]. I put together a short guide on how [their company type] running [X]+ currencies handle treasury and payments from one platform instead of three. Thought it might be relevant given [Company]'s [specific detail]. Want me to send it over?
 ```
+
+**If CR not accepted:** Skip this step entirely. Do not send InMail as a substitute.
 
 ---
 
