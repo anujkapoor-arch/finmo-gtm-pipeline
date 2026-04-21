@@ -207,16 +207,33 @@ TIER 1: SDR (Days 1-13)           TIER 2: AE (Days 16-25)        TIER 3: CEO (Da
 
 ### Airtable Content Fields
 
-**SDR (existing fields):**
+**SDR Email:**
 - `custom_subject1` - Email 1 subject line
 - `custom_email1` through `custom_email4` - SDR email bodies
-- `custom_linkedin_cr` through `custom_linkedin4` - LinkedIn messages
 
-**AE (new fields):**
+**SDR LinkedIn:**
+- `sdr_linkedin_cr` - SDR connection request (non-salesy, curiosity-driven)
+- `sdr_linkedin_msg1` - Post-acceptance content-offer guide
+- `sdr_linkedin_msg2` - Observation about their setup (no ask)
+- `sdr_linkedin_msg3` - Open question (genuine curiosity)
+
+**AE Email:**
 - `email5_subject` through `email8_body` - AE email subjects + bodies
 
-**CEO (new fields):**
+**AE LinkedIn:**
+- `ae_linkedin_cr` - AE connection request (industry peer)
+- `ae_linkedin_msg1` - Post-acceptance industry insight
+- `ae_linkedin_msg2` - Company-specific value observation
+- `ae_linkedin_msg3` - Zero pressure close ("if this isn't on your radar, totally fine")
+
+**CEO Email:**
 - `email9_subject` through `email10_body` - CEO email subjects + bodies
+
+**CEO LinkedIn:**
+- `ceo_linkedin_msg1` - CEO final connection message
+
+**Legacy fields (to delete in Airtable UI):**
+- `custom_linkedin_cr`, `custom_linkedin1`, `custom_linkedin2`, `custom_linkedin3`, `custom_linkedin4`
 
 **WhatsApp (new fields):**
 - `whatsapp_sdr_1`, `whatsapp_sdr_2` - SDR WhatsApp
