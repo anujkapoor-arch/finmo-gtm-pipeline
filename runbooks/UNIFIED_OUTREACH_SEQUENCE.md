@@ -95,6 +95,18 @@ These phrases scream "AI-generated cold email." Never use them as openers:
 
 **CRITICAL: `{{sender_first_name}}` is for SIGN-OFFS and SENDER references ONLY.** Never use it in the greeting/salutation line. Greetings must always use the recipient's actual first name (e.g., "Hi David," not "Hi {{sender_first_name}},"). This is a common AI generation error - always verify.
 
+### Sign-Off Format
+
+Sign-offs vary by tier. Always use full name (`{{sender_first_name}} {{sender_last_name}}`), never first name only.
+
+| Tier | Sign-Off |
+|------|----------|
+| **SDR (E1-E4)** | `Cheers,<br>{{sender_first_name}} {{sender_last_name}}` |
+| **AE (E5-E8)** | `Best,<br>{{sender_first_name}} {{sender_last_name}}` |
+| **CEO (E9-E10)** | `{{sender_first_name}}` (CEO stays informal, first name only) |
+
+E1 may optionally be left unsigned (raw hypothesis style).
+
 All email, LinkedIn, AND WhatsApp bodies MUST use `{{sender_first_name}}` everywhere a sender name appears. This includes:
 - Email sign-offs (end of body)
 - CEO/Founder LinkedIn messages (custom_linkedin3)
