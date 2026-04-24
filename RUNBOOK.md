@@ -185,7 +185,16 @@ Follow `runbooks/UNIFIED_RESEARCH_RUNBOOK.md`:
 
 ## Phase 2: Content Generation
 
-Follow `runbooks/UNIFIED_OUTREACH_SEQUENCE.md`:
+Follow `runbooks/UNIFIED_OUTREACH_SEQUENCE.md` for voice, structure, and formulas.
+
+**When dispatching to a Claude content-generation subagent,** use the canonical spec in `runbooks/CONTENT_GENERATION_SUBAGENT.md`. That file defines:
+- The exact field → formula → sender mapping (33 fields)
+- The output JSON schema (strict whitelist — no meta-fields)
+- Pre-generation filter rules (disqualify before dispatching, not inside the subagent)
+- Completeness contract (every `missing` field must land in `generated`)
+- The canonical prompt template to paste verbatim
+
+**Why it matters:** Apr 2026 Lead Gen 3.0 shipped with 78% of records partial and 9 records fully empty because subagents made unilateral skip decisions and emitted meta-fields (`_skip_reason`, `_note`) that rejected entire Airtable batches with HTTP 422. The new spec eliminates both failure modes.
 
 ### Content Per Priority
 
@@ -344,7 +353,7 @@ curl -s "https://api.hubapi.com/crm/v3/objects/contacts/search" \
 
 ## Phase 4b: Sanity Checks (Run After Every Push)
 
-These checks catch issues discovered during pipeline operations. Run ALL of them before launching any campaign.
+These checks catch issues discovered during pipeline operations. Run ALL of them before launching any campaign. 16 rules total; rules 14-16 were added after the Apr 2026 content-gen incident (see `runbooks/CONTENT_GENERATION_SUBAGENT.md` for root cause).
 
 ### 1. Zero Timezone Gaps
 Every prospect must have a `Timezone` value. SmartReach uses this for send timing.
@@ -379,13 +388,15 @@ Fix: Keep record with higher Lead Score, merge content fields from duplicate, de
 Watch for: Name variants like "Timothy Bartholomew CA/CPA" vs "Timothy Bartholomew".
 ```
 
-### 5. P1/P2 Content Completeness
-Every P1 lead must have SDR (E1-E4) + AE (E5-E8) + CEO (E9-E10) content.
-Every P2 lead must have SDR (E1-E4) + AE (E5-E8) content.
+### 5. Field-Level Content Completeness
+Every record in scope must have every expected field populated for its tier. This check enumerates all 33 template fields — not just sentinel fields. (The original implementation only sampled `custom_email1`, `email5_body`, `email9_body`; Apr 2026 showed that records could pass that check while 30 other fields were empty.)
 ```
-Query: For each HIGH priority record, check custom_email1, email5_body, email9_body are non-empty.
-Expected: P1 (score 70+) has all three tiers. P2 (score 50-69) has SDR + AE.
-Fix: Regenerate missing content via Claude agent.
+Expected per tier:
+  P1 (HIGH, score >= 70):  all 33 fields (SDR + AE + CEO)
+  P2 (HIGH, score 50-69):  25 fields (SDR + AE)
+  P3 (MEDIUM or NURTURE with score >= 35): 11 fields (SDR only)
+  P4 (score < 35):         no content expected
+Fix: Regenerate missing fields via the subagent spec in runbooks/CONTENT_GENERATION_SUBAGENT.md.
 ```
 
 ### 6. No Hardcoded Sender Names
@@ -452,12 +463,37 @@ Valid SDR values: Harini, Sukriti.
 Valid AE values: Gibson Saw, Nouvelle Nye, Elross Pangue, Michelle Ling.
 ```
 
+### 14. No Meta-Fields or SKIPPED Placeholders in Content
+Apr 2026 incident: subagents emitted `_skip_reason` and `_note` keys alongside real content. Airtable rejected the entire 10-record batch with HTTP 422 UNKNOWN_FIELD_NAME on the first unknown key. Also caught: subagents using `SKIPPED - DISQUALIFIED (...)` as placeholder values instead of real content.
+```
+Query: Search all text field values for strings starting with "SKIPPED" (case-insensitive).
+       Subagent output JSON must never contain keys starting with "_" or any key outside the 33-field whitelist.
+Expected: 0 matches.
+Fix: Re-run the subagent per runbooks/CONTENT_GENERATION_SUBAGENT.md — that spec forbids both meta-fields AND skip-refusals.
+```
+
+### 15. No Em Dashes in Content
+Em dashes (`—`) are a reliable AI tell. Use hyphens instead.
+```
+Query: Search all text fields for the em dash character.
+Expected: 0 matches.
+Fix: Replace with hyphens.
+```
+
+### 16. No Banned Openings in Email Bodies
+Banned: "Still thinking about", "Following up on", "I've been talking to", "One pattern that keeps coming up", "Two patterns keep coming up", "I keep seeing", "I keep hearing from", "Interesting trend:", "Quick follow-up on".
+```
+Query: For each email body, strip HTML greeting then check the first sentence against the banned list.
+Expected: 0 matches.
+Fix: Rewrite opening with a specific fact or number about their company.
+```
+
 ### Quick Sanity Check Script
 Run this after every push to catch all issues at once:
 ```bash
 python3 scripts/pipeline/lg3_sanity_check.py --config config/config.json
 ```
-*(Script checks all 13 rules above and reports pass/fail with counts.)*
+*(Script checks all 16 rules above and reports pass/fail with counts.)*
 
 ---
 
@@ -610,7 +646,8 @@ Expected for re-runs. Use `update_existing=true` endpoint to update content on e
 | `config/config.example.json` | Template - copy to config.json |
 | `config/field_mappings.json` | Airtable/HubSpot/SmartReach field definitions |
 | `runbooks/UNIFIED_RESEARCH_RUNBOOK.md` | How to research and score leads |
-| `runbooks/UNIFIED_OUTREACH_SEQUENCE.md` | How to generate outreach content |
+| `runbooks/UNIFIED_OUTREACH_SEQUENCE.md` | How to generate outreach content (formulas, voice, structure) |
+| `runbooks/CONTENT_GENERATION_SUBAGENT.md` | Canonical spec for content-gen subagents (field mapping, output contract, prompt template) |
 | `scripts/pipeline/lg3_create_airtable_fields.py` | One-time field creation |
 | `scripts/pipeline/lg3_push_to_airtable.py` | Push to Airtable |
 | `scripts/pipeline/lg3_push_to_hubspot.py` | Push to HubSpot |

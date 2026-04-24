@@ -44,6 +44,8 @@ Open Door                         Relevant Question, Up to You     Coffee, not d
 
 **Pattern: Discovery -> Selling -> Social Proof -> Pause -> Selling -> Discovery -> Value -> Pause -> Personal -> Insight. Every email zig-zags.**
 
+> **Dispatching to a Claude subagent?** Use the canonical spec and prompt template in [CONTENT_GENERATION_SUBAGENT.md](CONTENT_GENERATION_SUBAGENT.md). It enforces this formula shuffle, the 33-field output whitelist, and the no-meta-fields contract — all of which this document describes but doesn't force.
+
 ---
 
 ## Global Rules (Apply to ALL Content)

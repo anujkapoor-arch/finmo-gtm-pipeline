@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 """
-Sanity check script - runs all 13 quality checks against Airtable data.
+Sanity check script - runs quality checks against Airtable data.
 Reports pass/fail with counts for each rule.
 
 Usage:
   python3 lg3_sanity_check.py --config config/config.json
   python3 lg3_sanity_check.py --config config/config.json --table AU
+
+Rules (16 total):
+  1.  Timezone populated
+  2.  HubSpot Contact URL populated
+  5.  Content completeness (all 33 template fields per record for the target tier)
+  6.  No hardcoded sender names
+  7.  No {{sender_first_name}} in greetings
+  8.  Correct sign-off format (Cheers/Best/first-name)
+  9.  LinkedIn CR is non-salesy
+  10. AE LinkedIn CR exists where AE content exists
+  12. No email domain mismatches
+  13. SDR + AE Owner assigned
+  14. No meta-fields leaked into content (no keys/values starting with "_" or "SKIPPED")
+  15. No em dashes in content
+  16. No banned openings in email bodies
 """
 import json
 import argparse
@@ -47,29 +62,61 @@ def main():
     if args.table:
         tables = {args.table: tables[args.table]}
 
+    # 33-field template whitelist (per runbooks/CONTENT_GENERATION_SUBAGENT.md)
+    SDR_FIELDS = [
+        "custom_subject1",
+        "custom_email1", "custom_email2", "custom_email3", "custom_email4",
+        "sdr_linkedin_cr",
+        "sdr_linkedin_msg1", "sdr_linkedin_msg2", "sdr_linkedin_msg3",
+        "whatsapp_sdr_1", "whatsapp_sdr_2",
+    ]
+    AE_FIELDS = [
+        "email5_subject", "email5_body",
+        "email6_subject", "email6_body",
+        "email7_subject", "email7_body",
+        "email8_subject", "email8_body",
+        "ae_linkedin_cr",
+        "ae_linkedin_msg1", "ae_linkedin_msg2", "ae_linkedin_msg3",
+        "whatsapp_ae_1", "whatsapp_ae_2",
+    ]
+    CEO_FIELDS = [
+        "email9_subject", "email9_body",
+        "email10_subject", "email10_body",
+        "ceo_linkedin_msg1",
+        "whatsapp_ceo_1", "whatsapp_ceo_2", "whatsapp_ceo_3",
+    ]
+    ALL_TEMPLATE_FIELDS = SDR_FIELDS + AE_FIELDS + CEO_FIELDS  # 33 fields total
+
     FETCH_FIELDS = [
         "Company Name", "Contact Name", "Contact Email", "Contact Title",
         "Timezone", "HubSpot Contact URL", "SDR Owner", "AE Owner",
         "Lead Score", "Priority",
-        "custom_email1", "custom_email2", "custom_email3", "custom_email4",
-        "custom_linkedin_cr", "custom_linkedin1", "ae_linkedin_cr",
-        "email5_body", "email6_body", "email7_body", "email8_body",
-        "email9_body", "email10_body",
+        "custom_linkedin_cr", "custom_linkedin1",  # legacy fields (deprecated but may still exist)
         "Website",
-    ]
+    ] + ALL_TEMPLATE_FIELDS
 
     TEXT_FIELDS = [
+        f for f in ALL_TEMPLATE_FIELDS
+        if f.endswith("_body") or f.startswith("custom_email") or "linkedin" in f or "whatsapp" in f
+    ] + ["custom_linkedin_cr", "custom_linkedin1", "custom_linkedin2",
+         "custom_linkedin3", "custom_linkedin4"]
+
+    EMAIL_BODY_FIELDS = [f for f in ALL_TEMPLATE_FIELDS if f.endswith("_body")] + [
         "custom_email1", "custom_email2", "custom_email3", "custom_email4",
-        "custom_linkedin_cr", "custom_linkedin1", "custom_linkedin2",
-        "custom_linkedin3", "custom_linkedin4", "ae_linkedin_cr",
-        "email5_body", "email6_body", "email7_body", "email8_body",
-        "email9_body", "email10_body",
+    ]
+
+    BANNED_OPENINGS = [
+        "Still thinking about", "Following up on", "I've been talking to",
+        "One pattern that keeps coming up", "Two patterns keep coming up",
+        "I keep seeing", "I keep hearing from", "Interesting trend:",
+        "Quick follow-up on",
     ]
 
     VALID_SDRS = {"Harini", "Sukriti"}
     VALID_AES = {"Gibson Saw", "Nouvelle Nye", "Elross Pangue", "Michelle Ling"}
 
-    results = {i: {"pass": 0, "fail": 0, "details": []} for i in range(1, 14)}
+    # 1-13 are existing checks; 14-16 are new post-mortem additions.
+    results = {i: {"pass": 0, "fail": 0, "details": []} for i in range(1, 17)}
     total_records = 0
 
     for table_name, table_id in tables.items():
@@ -104,27 +151,35 @@ def main():
 
             # 4. Duplicates (checked by grouping - handled below)
 
-            # 5. Content completeness
+            # 5. Field-level content completeness (enumerates every expected field per tier)
+            # P1 (HIGH, score >= 70): SDR + AE + CEO fields (all 33)
+            # P2 (HIGH, score 50-69): SDR + AE fields (25)
+            # P3 (MEDIUM / NURTURE, score 35-49): SDR fields only (11)
+            # P4 (score < 35): no content expected
+            expected_fields = []
+            tier = None
             if priority == "HIGH" and int(score) >= 70:
-                # P1 - needs SDR + AE + CEO
-                if has_sdr and has_ae and has_ceo:
-                    results[5]["pass"] += 1
-                else:
-                    results[5]["fail"] += 1
-                    missing = []
-                    if not has_sdr: missing.append("SDR")
-                    if not has_ae: missing.append("AE")
-                    if not has_ceo: missing.append("CEO")
-                    results[5]["details"].append(f"{table_name}: {company} (score {score}) missing {','.join(missing)}")
+                expected_fields = SDR_FIELDS + AE_FIELDS + CEO_FIELDS
+                tier = "P1"
             elif priority == "HIGH":
-                # P2 - needs SDR + AE
-                if has_sdr and has_ae:
+                expected_fields = SDR_FIELDS + AE_FIELDS
+                tier = "P2"
+            elif priority == "MEDIUM" or (priority == "NURTURE" and int(score) >= 35):
+                expected_fields = SDR_FIELDS
+                tier = "P3"
+            # else: no content expected — skip the check
+
+            if expected_fields:
+                missing_fields = [fld for fld in expected_fields if not f.get(fld)]
+                if not missing_fields:
                     results[5]["pass"] += 1
-                elif has_sdr:
-                    results[5]["fail"] += 1
-                    results[5]["details"].append(f"{table_name}: {company} (score {score}) missing AE")
                 else:
-                    results[5]["pass"] += 1  # No content expected for very low scores
+                    results[5]["fail"] += 1
+                    results[5]["details"].append(
+                        f"{table_name}: {company} ({tier}, score {score}) "
+                        f"missing {len(missing_fields)}/{len(expected_fields)} fields: "
+                        f"{', '.join(missing_fields[:5])}{'...' if len(missing_fields) > 5 else ''}"
+                    )
 
             # 6. No hardcoded sender names
             hardcoded_found = False
@@ -208,6 +263,54 @@ def main():
                     if has_ae and ae not in VALID_AES: issues.append(f"AE='{ae}'")
                     results[13]["details"].append(f"{table_name}: {company} | {', '.join(issues)}")
 
+            # 14. No meta-fields / SKIPPED placeholders leaked into content
+            # Root cause: Apr 2026 incident where subagents emitted _skip_reason/_note
+            # alongside real content, breaking Airtable PATCH with 422 UNKNOWN_FIELD_NAME.
+            # Also catches SKIPPED placeholder values that subagents used instead of real content.
+            meta_issue = False
+            for tf in TEXT_FIELDS:
+                val = f.get(tf, "")
+                if not val or not isinstance(val, str):
+                    continue
+                if val.strip().upper().startswith("SKIPPED"):
+                    meta_issue = True
+                    results[14]["details"].append(f"{table_name}: {company} | {tf} | starts with 'SKIPPED'")
+            if meta_issue:
+                results[14]["fail"] += 1
+            else:
+                results[14]["pass"] += 1
+
+            # 15. No em dashes in content
+            # Em dashes are a reliable AI tell. Use hyphens instead.
+            em_dash_issue = False
+            for tf in TEXT_FIELDS:
+                val = f.get(tf, "")
+                if val and "—" in val:
+                    em_dash_issue = True
+                    results[15]["details"].append(f"{table_name}: {company} | {tf}")
+            if em_dash_issue:
+                results[15]["fail"] += 1
+            else:
+                results[15]["pass"] += 1
+
+            # 16. No banned openings in email bodies
+            opening_issue = False
+            for tf in EMAIL_BODY_FIELDS:
+                val = f.get(tf, "")
+                if not val:
+                    continue
+                # Strip common HTML prefix and greeting to find the real first sentence
+                stripped = re.sub(r"^(Hi [^,<]+,\s*(<br>)+\s*)", "", val, flags=re.IGNORECASE)
+                for banned in BANNED_OPENINGS:
+                    if stripped.lstrip().startswith(banned):
+                        opening_issue = True
+                        results[16]["details"].append(f"{table_name}: {company} | {tf} | starts with '{banned}'")
+                        break
+            if opening_issue:
+                results[16]["fail"] += 1
+            else:
+                results[16]["pass"] += 1
+
     # Print results
     print("=" * 70)
     print(f"SANITY CHECK RESULTS ({total_records} records across {len(tables)} tables)")
@@ -216,7 +319,7 @@ def main():
     checks = {
         1: "Timezone populated",
         2: "HubSpot Contact URL populated",
-        5: "P1/P2 content completeness",
+        5: "Field-level content completeness (all template fields for tier)",
         6: "No hardcoded sender names",
         7: "No {{sender_first_name}} in greetings",
         8: "Correct sign-off format (Cheers/Best + full name)",
@@ -224,6 +327,9 @@ def main():
         10: "AE LinkedIn CR exists where AE content exists",
         12: "No email domain mismatches",
         13: "SDR + AE Owner assigned",
+        14: "No meta-fields or SKIPPED placeholders in content",
+        15: "No em dashes in content",
+        16: "No banned openings in email bodies",
     }
 
     all_pass = True
