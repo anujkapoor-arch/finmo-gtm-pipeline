@@ -21,6 +21,7 @@ Rules (16 total):
   14. No meta-fields leaked into content (no keys/values starting with "_" or "SKIPPED")
   15. No em dashes in content
   16. No banned openings in email bodies
+  17. One AE per company (no AE conflicts across multi-contact firms)
 """
 import json
 import argparse
@@ -115,9 +116,21 @@ def main():
     VALID_SDRS = {"Harini", "Sukriti"}
     VALID_AES = {"Gibson Saw", "Nouvelle Nye", "Elross Pangue", "Michelle Ling"}
 
-    # 1-13 are existing checks; 14-16 are new post-mortem additions.
-    results = {i: {"pass": 0, "fail": 0, "details": []} for i in range(1, 17)}
+    # 1-13 are existing checks; 14-16 added after Apr 2026 content-gen incident;
+    # 17 added after Apr 2026 AE-split-by-company incident.
+    results = {i: {"pass": 0, "fail": 0, "details": []} for i in range(1, 18)}
     total_records = 0
+
+    # Used by check #17 - aggregate per normalized company across all tables
+    _COMPANY_SUFFIX_RE = re.compile(
+        r'(?i)\b(pty|ltd|limited|inc|incorporated|llc|plc|group|holdings|corp|corporation|gmbh|bv|sa|ag|nv)\b'
+    )
+    def _norm_company(name):
+        if not name:
+            return ""
+        n = _COMPANY_SUFFIX_RE.sub('', name)
+        return re.sub(r'[^a-z0-9]+', ' ', n.lower()).strip()
+    company_to_aes = {}  # normalized_co -> {ae: [(table, contact, raw_co), ...]}
 
     for table_name, table_id in tables.items():
         records = fetch_all_records(base_id, table_id, FETCH_FIELDS, headers)
@@ -311,6 +324,26 @@ def main():
             else:
                 results[16]["pass"] += 1
 
+            # 17. One AE per company - aggregate across all records, evaluate after the loop
+            ae = f.get("AE Owner", "") or ""
+            nc = _norm_company(f.get("Company Name", ""))
+            if nc and ae:
+                company_to_aes.setdefault(nc, {}).setdefault(ae, []).append(
+                    (table_name, f.get("Contact Name", ""), f.get("Company Name", ""))
+                )
+
+    # Post-loop check #17: companies that span multiple AEs
+    for nc, ae_map in company_to_aes.items():
+        if len(ae_map) > 1:
+            results[17]["fail"] += 1
+            ae_list = ", ".join(f"{ae} ({len(rows)})" for ae, rows in ae_map.items())
+            sample = list(ae_map.values())[0][0]  # first record in any AE bucket
+            results[17]["details"].append(
+                f"{sample[0]}: '{nc}' split across {len(ae_map)} AEs: {ae_list}"
+            )
+        else:
+            results[17]["pass"] += 1
+
     # Print results
     print("=" * 70)
     print(f"SANITY CHECK RESULTS ({total_records} records across {len(tables)} tables)")
@@ -330,6 +363,7 @@ def main():
         14: "No meta-fields or SKIPPED placeholders in content",
         15: "No em dashes in content",
         16: "No banned openings in email bodies",
+        17: "One AE per company (no AE conflicts across multi-contact firms)",
     }
 
     all_pass = True

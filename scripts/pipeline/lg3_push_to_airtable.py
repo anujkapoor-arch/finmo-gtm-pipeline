@@ -9,6 +9,7 @@ Usage:
 """
 import json
 import argparse
+import re
 import requests
 import time
 from datetime import date
@@ -57,16 +58,52 @@ def get_existing_emails(base_id, table_id, headers):
             break
     return email_to_record
 
+_COMPANY_SUFFIX_RE = re.compile(
+    r'(?i)\b(pty|ltd|limited|inc|incorporated|llc|plc|group|holdings|corp|corporation|gmbh|bv|sa|ag|nv)\b'
+)
+
+def normalize_company_name(name):
+    """Lowercase and strip legal suffixes / punctuation. Used to dedupe
+    'Acme Inc' vs 'Acme Inc.' vs 'Acme Group' as the same firm for AE assignment."""
+    if not name:
+        return ""
+    n = _COMPANY_SUFFIX_RE.sub('', name)
+    return re.sub(r'[^a-z0-9]+', ' ', n.lower()).strip()
+
+
 def assign_owners(leads, config):
-    """Assign SDR and AE owners via round-robin."""
+    """Assign SDR and AE owners.
+
+    AE is grouped by normalized company name: all contacts at the same firm
+    must land with the same AE. Otherwise two AEs end up engaging one company
+    independently. Pre-assigned AEs are preserved and propagated to siblings.
+
+    SDR remains per-lead round-robin (different SDR cadences are intentional).
+    """
     sdrs = cycle(config["owners"]["sdrs"])
     aes = cycle(config["owners"]["aes"])
 
+    # Pass 1: collect any pre-assigned AE per normalized company so we
+    # propagate that choice to other contacts at the same firm.
+    company_to_ae = {}
+    for lead in leads:
+        co = normalize_company_name(lead.get("company_name") or lead.get("Company Name"))
+        ae = lead.get("ae") or lead.get("AE Owner")
+        if co and ae and co not in company_to_ae:
+            company_to_ae[co] = ae
+
+    # Pass 2: assign SDRs (per-lead) and AEs (per-company).
     for lead in leads:
         if not lead.get("sdr"):
             lead["sdr"] = next(sdrs)
         if not lead.get("ae"):
-            lead["ae"] = next(aes)
+            co = normalize_company_name(lead.get("company_name") or lead.get("Company Name"))
+            if co and co in company_to_ae:
+                lead["ae"] = company_to_ae[co]
+            else:
+                lead["ae"] = next(aes)
+                if co:
+                    company_to_ae[co] = lead["ae"]
     return leads
 
 PRIORITY_MAP = {"P1": "HIGH", "P2": "HIGH", "P3": "MEDIUM", "P4": "NURTURE"}

@@ -265,10 +265,12 @@ python3 scripts/pipeline/lg3_push_to_airtable.py --config config/config.json
 
 **What it does:**
 - Loads scored leads + content from JSON
-- Assigns SDR and AE owners (round-robin or manual)
+- Assigns SDR and AE owners. **AE assignment is grouped by normalized company name** so all contacts at the same firm always land with the same AE; SDR remains per-lead round-robin. Pre-assigned AEs propagate to siblings at the same company.
 - Maps priority (P1/P2 -> HIGH, P3 -> MEDIUM, P4 -> NURTURE)
 - Creates new records or updates existing (matched by Contact Email)
 - Pushes all research fields, scores, and content
+
+**Lead-assignment rule (added Apr 2026):** One AE per company. If a firm has multiple contacts (e.g., a Group CFO and a Finance Director at the same parent), all of them must be owned by the same AE. The push script enforces this by normalizing company names (stripping legal suffixes like "Pty Ltd", "Group", "Corp") before round-robin AE assignment. Sanity check #17 verifies post-push.
 
 ### Step 2: HubSpot (CRM + Research Notes)
 
@@ -354,7 +356,7 @@ curl -s "https://api.hubapi.com/crm/v3/objects/contacts/search" \
 
 ## Phase 4b: Sanity Checks (Run After Every Push)
 
-These checks catch issues discovered during pipeline operations. Run ALL of them before launching any campaign. 16 rules total; rules 14-16 were added after the Apr 2026 content-gen incident (see `runbooks/CONTENT_GENERATION_SUBAGENT.md` for root cause).
+These checks catch issues discovered during pipeline operations. Run ALL of them before launching any campaign. 17 rules total; rules 14-16 were added after the Apr 2026 content-gen incident (see `runbooks/CONTENT_GENERATION_SUBAGENT.md` for root cause); rule 17 was added after the Apr 2026 AE-split incident (Eakin Healthcare had two contacts on two different AEs because round-robin didn't dedupe by company).
 
 ### 1. Zero Timezone Gaps
 Every prospect must have a `Timezone` value. SmartReach uses this for send timing.
@@ -489,12 +491,24 @@ Expected: 0 matches.
 Fix: Rewrite opening with a specific fact or number about their company.
 ```
 
+### 17. One AE Per Company
+All contacts at the same firm must share an AE. Round-robin per-record assignment can otherwise split a company across two AEs, who then engage independently and step on each other's outreach.
+```
+Query: Group records across all 4 tables by normalized company name (strip suffixes
+       like Pty/Ltd/Group/Corp/Inc/GmbH). For each group with 2+ records, count
+       distinct AE Owner values.
+Expected: 0 groups with more than 1 distinct AE.
+Fix: Reassign the minority AE-owned record(s) to match the majority AE for that
+     company. The lg3_push_to_airtable.py assign_owners() function enforces this
+     on new pushes by normalizing company name before round-robin assignment.
+```
+
 ### Quick Sanity Check Script
 Run this after every push to catch all issues at once:
 ```bash
 python3 scripts/pipeline/lg3_sanity_check.py --config config/config.json
 ```
-*(Script checks all 16 rules above and reports pass/fail with counts.)*
+*(Script checks all 17 rules above and reports pass/fail with counts.)*
 
 ---
 
