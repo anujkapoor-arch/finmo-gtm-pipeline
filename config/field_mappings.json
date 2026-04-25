@@ -209,6 +209,7 @@
     "firstname": "split_name(Contact Name)[0]",
     "lastname": "split_name(Contact Name)[1]",
     "email": "Contact Email",
+    "phone": "normalize_phone(Contact Phone, region, Person Country | first Countries entry)",
     "jobtitle": "Contact Title",
     "company": "Company Name",
     "website": "Website",

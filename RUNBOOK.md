@@ -280,6 +280,7 @@ python3 scripts/pipeline/lg3_push_to_hubspot.py --config config/config.json
 **What it does:**
 - Creates/updates HubSpot contacts
 - Sets owner, timezone, MQL type
+- Pushes contact phone to HubSpot `phone` property, normalized to E.164 (Airtable `Contact Phone` -> `+CCNNNN...`). Country code inferred from `batch.region` (AU/SG/PH) or, for "Other", from `Person Country` / first `Countries` entry. Numbers we can't confidently normalize are passed through unchanged so valid input is never damaged.
 - Writes full research profile to `marketing_notes`:
 
 ```

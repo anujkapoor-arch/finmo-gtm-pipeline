@@ -8,9 +8,94 @@ Usage:
 """
 import json
 import argparse
+import re
 import requests
 import time
 from itertools import cycle
+
+# Region -> country calling code (used as primary inference for AU/SG/PH batches).
+REGION_COUNTRY_CODE = {
+    "AU": "61",
+    "SG": "65",
+    "PH": "63",
+}
+
+# Country name (lowercase substring) -> calling code, used when region is "Other".
+# Lookup is by substring match against Person Country / first Countries entry,
+# so "United States" matches "us", "America" matches "america", etc.
+COUNTRY_NAME_TO_CC = {
+    "australia": "61", "singapore": "65", "philippines": "63",
+    "united kingdom": "44", "england": "44", "scotland": "44", "wales": "44", "uk": "44",
+    "united states": "1", "america": "1", "usa": "1",
+    "canada": "1",
+    "france": "33", "germany": "49", "switzerland": "41", "austria": "43",
+    "sweden": "46", "norway": "47", "denmark": "45", "finland": "358",
+    "netherlands": "31", "belgium": "32", "ireland": "353", "iceland": "354",
+    "italy": "39", "spain": "34", "portugal": "351", "poland": "48",
+    "india": "91", "japan": "81", "china": "86", "hong kong": "852",
+    "malaysia": "60", "thailand": "66", "vietnam": "84", "indonesia": "62",
+    "new zealand": "64", "south africa": "27",
+    "uae": "971", "united arab emirates": "971",
+    "israel": "972", "saudi arabia": "966", "qatar": "974",
+}
+
+
+def normalize_phone(raw, region=None, country=None):
+    """Best-effort E.164 normalization.
+
+    Returns "+CCNNNN..." when confident; returns the original input string when
+    the country cannot be inferred, so we never damage a valid phone number that
+    we just couldn't fully canonicalize. HubSpot accepts non-E.164 values too,
+    so a passthrough is safe.
+
+    Inference order: explicit + prefix > 00 international prefix > region > country name.
+    """
+    if not raw:
+        return ""
+    s = str(raw).strip()
+    if not s:
+        return ""
+
+    # Already E.164-shaped (starts with +): clean punctuation, validate length, return.
+    if s.startswith("+"):
+        digits = re.sub(r"[^\d]", "", s[1:])
+        if 7 <= len(digits) <= 15:
+            return "+" + digits
+        return s  # malformed - preserve original rather than emit a partial
+
+    # 00 international dialing prefix -> +
+    if s.startswith("00"):
+        digits = re.sub(r"[^\d]", "", s[2:])
+        if 7 <= len(digits) <= 15:
+            return "+" + digits
+        return s
+
+    digits = re.sub(r"[^\d]", "", s)
+    if not digits:
+        return s
+
+    # Infer country code: region (config) takes precedence, then country name.
+    cc = REGION_COUNTRY_CODE.get(region) if region else None
+    if not cc and country:
+        country_lower = country.lower()
+        for name, code in COUNTRY_NAME_TO_CC.items():
+            if name in country_lower:
+                cc = code
+                break
+
+    if cc:
+        # Number may already include the country code (e.g., "61212345678" for AU).
+        # If so, just prepend +; otherwise strip the national trunk-prefix 0 and add +CC.
+        if digits.startswith(cc):
+            candidate = "+" + digits
+        else:
+            candidate = "+" + cc + digits.lstrip("0")
+        bare = candidate[1:]
+        if 7 <= len(bare) <= 15:
+            return candidate
+
+    # Couldn't normalize confidently - preserve input so downstream tools can handle it.
+    return s
 
 def load_config(path):
     with open(path) as f:
@@ -125,6 +210,17 @@ def build_properties(lead, config):
 
     email = (lead.get("contact_email", "") or lead.get("Contact Email", "")).strip()
     if email: props["email"] = email
+
+    # Phone -> HubSpot standard `phone` property, normalized to E.164 when possible.
+    # Falls back to the original input if country cannot be inferred (HubSpot accepts
+    # both formats; preserving the value is safer than emitting a half-normalized one).
+    raw_phone = str(lead.get("contact_phone", "") or lead.get("Contact Phone", "") or "").strip()
+    if raw_phone:
+        person_country = lead.get("person_country", "") or lead.get("Person Country", "")
+        countries_raw = lead.get("countries", "") or lead.get("Countries", "")
+        first_country = countries_raw.split(",")[0].strip() if countries_raw else ""
+        country_hint = person_country or first_country
+        props["phone"] = normalize_phone(raw_phone, region=region, country=country_hint)
 
     title = lead.get("contact_title", "") or lead.get("Contact Title", "")
     if title: props["jobtitle"] = title
