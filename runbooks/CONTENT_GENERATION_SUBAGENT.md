@@ -15,7 +15,13 @@ In Apr 2026, a content-gen run over 112 Lead Gen 3.0 records left 87 of them par
 3. **Subagents made unilateral skip decisions.** Each batch subagent independently decided to skip records flagged as DISQUALIFIED in source data. The orchestrator never asked them to — and inconsistency across batches meant some disqualified records got content, others didn't.
 4. **No canonical prompt.** Every run reinvented the field-to-formula-to-sender mapping from scratch, producing subtle drift.
 
-This spec fixes all four.
+In May 2026, two more issues surfaced:
+
+5. **AE LinkedIn messages skipped sender introductions entirely.** The original `ae_linkedin_msg1` template was "Thanks for connecting. One thing I keep seeing with multi-country manufacturers..." which dropped the prospect straight into an abstract observation with no introduction of who was reaching out or why. Every successful real-human LinkedIn outreach the team received opened with a sender introduction, a one-line description of the company, and a specific reason for reaching out. The AE LinkedIn fields (`ae_linkedin_cr`, `ae_linkedin_msg1`, `ae_linkedin_msg2`, `ae_linkedin_msg3`) were rewritten to follow this real-human pattern. Banned: "an AE at Finmo" (use just "from Finmo"), "Following up on", "I keep seeing", "Curious if that matches your experience".
+
+6. **Em dashes leaked through.** Subagents kept producing em dashes (—) in the new AE LinkedIn output despite explicit bans, particularly in long-form messages with appositive clauses. The validator catches them; the prompt now includes em dashes in the BANNED LIST at the top, with examples of how to replace them (commas, periods, or hyphens).
+
+This spec fixes all six.
 
 ---
 
@@ -119,13 +125,13 @@ This is the canonical mapping. Follow it exactly. Every field has one formula, o
 | `whatsapp_ceo_2` | CEO WA: one-line compliment about the company | CEO | — |
 | `whatsapp_ceo_3` | CEO WA: coffee/call ask (MUST include `(potentially)`) | CEO | — |
 | `sdr_linkedin_cr` | SDR Connection Request (under 300 chars, SDR template) | SDR | — |
-| `ae_linkedin_cr` | AE Connection Request (under 300 chars, AE template) | AE | — |
+| `ae_linkedin_cr` | AE Connection Request (under 300 chars). **NEW shape (May 2026):** greeting + AE self-intro `{{sender_first_name}} from Finmo` + 1-line Finmo + specific anchor on their setup + "would love to connect". NEVER include "an AE" as a role title. See UNIFIED_OUTREACH_SEQUENCE.md "Day 0: LinkedIn Connection Request (SDR)" section, AE CR Template subsection. | AE | — |
 | `sdr_linkedin_msg1` | After CR accepted: content-guide offer | SDR | — |
 | `sdr_linkedin_msg2` | Observation about their setup (no ask) | SDR | — |
 | `sdr_linkedin_msg3` | One specific question about their process | SDR | — |
-| `ae_linkedin_msg1` | Thanks for connecting + one hypothesis | AE | — |
-| `ae_linkedin_msg2` | Market trend / data point (no question) | AE | — |
-| `ae_linkedin_msg3` | Open-door close with opt-out ("If this isn't on your radar, totally fine") | AE | — |
+| `ae_linkedin_msg1` | **NEW shape (May 2026, 70-110 words):** greeting + thanks + `I'm {{sender_first_name}} {{sender_last_name}} from Finmo.` + Finmo elevator pitch (1 line) + specific reason this prospect (3-4 short factual clauses from research) + CTA "Worth a 15-min call to see if it fits?". See UNIFIED_OUTREACH_SEQUENCE.md "Day ~19: LinkedIn Message 1 (AE)" section. | AE | — |
+| `ae_linkedin_msg2` | **NEW shape (May 2026, 80-120 words):** greeting + "following up. LinkedIn DMs disappear fast." + concrete data point (specific outcome with numbers) + maps to their setup + soft ask (call OR async writeup). NEVER use "Following up on" - just "following up". See UNIFIED_OUTREACH_SEQUENCE.md "Day 21: LinkedIn Message 2 (AE)" section. | AE | — |
+| `ae_linkedin_msg3` | **NEW shape (May 2026, 60-90 words):** greeting + "last note from my side on this thread" + "Totally fine if treasury and payments isn't where the focus is right now" + open door with 2-3 trigger events. No CTA. See UNIFIED_OUTREACH_SEQUENCE.md "Day 24: LinkedIn Message 3 (AE)" section. | AE | — |
 | `ceo_linkedin_msg1` | CEO final LinkedIn message ("my team has been following...") | CEO | — |
 
 ### Sign-off format (per tier)
@@ -173,11 +179,12 @@ Before you dispatch a record to a content-gen subagent, apply these filters. Rec
 
 Full rules in [UNIFIED_OUTREACH_SEQUENCE.md](UNIFIED_OUTREACH_SEQUENCE.md). Fail-the-push shortlist:
 
-- **No em dashes.** Use hyphens. Em dashes (`—`) are a reliable AI tell.
+- **No em dashes (`—`).** Use commas, periods, or hyphens (`-`). Em dashes are the single biggest AI tell. The validator should grep for `—` and reject any output that contains one.
+- **No "an AE at Finmo" phrasing.** When the AE introduces themselves, use `I'm {{sender_first_name}} {{sender_last_name}} from Finmo.` Drop the role title entirely. The earlier "an AE" phrasing read awkwardly and signaled template.
 - **No emojis.**
 - **HTML:** `<br><br>` between paragraphs, never `<p>` tags.
 - **Banned words:** leverage, comprehensive, robust, seamless, cutting-edge, innovative, synergy, streamline, optimize, utilize, facilitate, enhance, foster, delve, excited to, it's worth noting.
-- **Banned openings:** "Still thinking about...", "Following up on...", "I've been talking to...", "One pattern that keeps coming up...", "Two patterns keep coming up...", "I keep seeing...", "I keep hearing from...", "Interesting trend:", "Quick follow-up on...".
+- **Banned openings:** "Still thinking about...", "Following up on..." (use just "following up"), "I've been talking to...", "One pattern that keeps coming up...", "Two patterns keep coming up...", "I keep seeing...", "I keep hearing from...", "Interesting trend:", "Quick follow-up on...", "Curious if that matches your experience...".
 - **Subject lines:** 2-5 words, lowercase, company-specific.
 - **Length:** SDR emails 40-130 words. AE emails 80-165 words. CEO emails under 80 words.
 - **LinkedIn CR:** under 300 characters, hard limit.

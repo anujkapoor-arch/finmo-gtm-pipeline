@@ -295,8 +295,11 @@ Hi [First Name] - came across [Company] while researching [industry/region] fina
 
 **AE CR Template (used when AE sends their own CR in Tier 2):**
 ```
-Hi [First Name] - I work with [their role type] at [their company type] across [region]. Your setup at [Company] stood out. Would love to connect and follow your work.
+Hi [First Name], {{sender_first_name}} from Finmo here. We help [their company type segment] consolidate [treasury / cross-border payments / cash visibility] in one platform. Saw [Company]'s [specific anchor: e.g., four-country, $48M financing setup] and thought it might be worth a quick chat. Would love to connect.
 ```
+
+**Why this shape (May 2026 rewrite):**
+The earlier AE CR opened with "I work with [role type] at [company type]..." which read as observational and abstract. Real-human LinkedIn outreach always opens with an explicit sender introduction (`{{sender_first_name}} from Finmo here`), then states what Finmo does in one line, then anchors on a SPECIFIC fact about the prospect's setup (not "your work" or "your role" — actual numbers/countries/currencies from research), then asks to connect. Compare against the patterns in real connection requests we receive: every successful one introduces the sender first.
 
 **Rules:**
 - Under 300 characters
@@ -506,12 +509,97 @@ If this isn't your world, just say so.<br><br>
 
 ---
 
-### Day 21: LinkedIn Message 2 - Market Trend
+### Day ~19: LinkedIn Message 1 (AE) - Post-CR-Accept Introduction
 
-**Goal:** Share a market reference. No direct pitch.
+**Goal:** First message after the prospect accepts the AE's connection request. Introduce the sender, state what Finmo does, give the specific reason for reaching out to THIS prospect, ask for a 15-min call.
 
+**Word limit:** 70-110 words.
+
+**Pattern:** greeting + thanks + AE self-intro + Finmo elevator pitch (1 line) + specific reason this prospect → CTA.
+
+**Template:**
 ```
-[First Name] - [relevant market insight from thesis or a specific observation about their industry]. Curious if [their company] is seeing the same pressure on the finance side.
+Hi [First Name], thanks for connecting!
+
+I'm {{sender_first_name}} {{sender_last_name}} from Finmo. We're a treasury platform with multi-currency payments built in. [One-line value: e.g., "One login for cash positions, FX, payouts, and collections across 30+ countries."]. Replaces the bank-plus-broker-plus-spreadsheet stack most [company-type] end up with.
+
+Reaching out because [Company]'s setup, [specific facts: 3-4 short clauses with real numbers], looked like exactly what we're built for.
+
+Worth a 15-min call to see if it fits?
+```
+
+**Working example (Harry Marfatia / Simba Global, 96 words):**
+```
+Hi Harry, thanks for connecting!
+
+I'm {{sender_first_name}} {{sender_last_name}} from Finmo. We're a treasury platform with multi-currency payments built in. One login for cash positions, FX, payouts, and collections across 30+ countries. Replaces the bank-plus-broker-plus-spreadsheet stack most manufacturers your size end up with.
+
+Reaching out because Simba Global's setup, four countries, four currencies, US and Asia manufacturing, $48M in financing, looked like exactly what we're built for.
+
+Worth a 15-min call to see if it fits?
+```
+
+**Banned in this message (May 2026 rewrite):**
+- "an AE at Finmo" - drop the role title, just say "from Finmo"
+- Any em dash (use commas, periods, or hyphens)
+- "I keep seeing", "One thing I keep seeing", "Curious if that matches your experience" - these patterns scream AI
+
+---
+
+### Day 21: LinkedIn Message 2 (AE) - Follow-Up With Data Point
+
+**Goal:** If no reply to Msg 1, share one concrete data point that maps to the prospect's setup, then offer a soft alternative to the call ask.
+
+**Word limit:** 80-120 words.
+
+**Pattern:** greeting + "following up" + concrete data point + maps to their setup + soft ask (call OR async writeup).
+
+**Template:**
+```
+Hi [First Name], following up. LinkedIn DMs disappear fast.
+
+Quick data point: a [similar company type] we work with [specific outcome with numbers: e.g., "cut weekly cash reconciliation from 8 hours to under 1"] after consolidating onto Finmo. For [Company]'s setup with [their specific context], that kind of [compression / consolidation / improvement] usually shows up first in [specific area: month-end close / FX timing / payroll funding / reconciliation].
+
+If a call's hard right now, happy to send a short async writeup of how it'd map to your setup. Just let me know either way.
+```
+
+**Working example (Harry, 104 words):**
+```
+Hi Harry, following up. LinkedIn DMs disappear fast.
+
+Quick data point: a similarly-sized multi-country manufacturer we work with cut weekly cash reconciliation from 8 hours to under 1 after consolidating onto Finmo. For Simba's setup with four countries plus active M&A, that kind of compression usually shows up first in month-end close and FX timing on Asian supplier payments.
+
+If a call's hard right now, happy to send a short async writeup of how it'd map to your setup. Just let me know either way.
+```
+
+**Banned:** "Following up on" (use just "following up"). The phrase "Following up on my earlier message" is on the kill list - it adds nothing and signals AI.
+
+---
+
+### Day 24: LinkedIn Message 3 (AE) - Open Door Close
+
+**Goal:** Last note in the AE LinkedIn thread. Zero pressure, no ask, leave the door open for trigger events.
+
+**Word limit:** 60-90 words.
+
+**Pattern:** greeting + "last note from my side" + open door (no ask, no pressure, no CTA).
+
+**Template:**
+```
+Hi [First Name], last note from my side on this thread.
+
+Totally fine if treasury and payments isn't where the focus is right now. If it ever comes up, [2-3 trigger events relevant to their context: new entity, expansion, M&A, refinancing, etc.], happy to pick this back up.
+
+Good to be connected either way.
+```
+
+**Working example (Harry, 62 words):**
+```
+Hi Harry, last note from my side on this thread.
+
+Totally fine if treasury and payments isn't where the focus is right now. If it ever comes up, new entity, expansion, post-M&A integration, happy to pick this back up.
+
+Good to be connected either way.
 ```
 
 ---
