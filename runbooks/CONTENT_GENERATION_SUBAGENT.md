@@ -177,6 +177,38 @@ Before you dispatch a record to a content-gen subagent, apply these filters. Rec
 
 ---
 
+## Batch Sizing (Orchestrator's Job)
+
+**Cap each subagent batch at ~7 records when generating 4+ fields per record (e.g., the 8 AE email fields, or the full 33-field per-record set).**
+
+### Why
+
+May 2026 incident: a subagent given 35 records × 8 fields = 280 fields (~40K output tokens) stalled twice in a row at the final Write step, both times triggering the 600-second stream watchdog. The agent's last logged action was *"Writing the output file now. Given the size, I'll write it in two halves and verify."* — they had finished generating the content but the Write tool stalled on the large single-payload response. Re-launching with the same input failed identically.
+
+**Workaround that worked:** split the failed batch's remaining 28 records into 4 parallel micro-batches of 7 each. Each micro-batch finished in 3-5 minutes (vs. 40+ min for the larger batch) and wrote cleanly in one Write call.
+
+### Sizing rules
+
+| Fields per record being generated | Max records per subagent batch |
+|---|---:|
+| 4 fields per record (e.g., AE LinkedIn only) | 35 |
+| 8 fields per record (e.g., AE email tier E5-E8) | **7** |
+| 17 fields per record (full AE tier) | 5 |
+| 33 fields per record (full sequence) | **3** |
+
+These caps assume the subagent writes its output in a single Write call. If you instruct the subagent to write incrementally (one part-file per group, then merge), you can go larger — but the merge step adds complexity and the stall risk on the final consolidation step is non-zero. **Default to small batches + parallelism.**
+
+### Parallelism
+
+If you have 100 records to process at 8 fields each, that's ~14 batches of 7. Launch them in parallel — current Claude Agent SDK supports launching N background agents concurrently and you'll get notifications as each finishes. Total wall-clock time for 14 micro-batches running in parallel is roughly the same as one batch (limited by the slowest agent), at the cost of more API calls.
+
+### When NOT to split
+
+- If the field count per record is small (1-2 fields), batches of 50+ are fine — output token volume stays manageable.
+- For pure extraction tasks (read content → extract structured fields, no creative generation), batches can be larger because the per-record output is shorter.
+
+---
+
 ## Writing Rules (non-negotiable)
 
 Full rules in [UNIFIED_OUTREACH_SEQUENCE.md](UNIFIED_OUTREACH_SEQUENCE.md). Fail-the-push shortlist:
