@@ -21,7 +21,9 @@ In May 2026, two more issues surfaced:
 
 6. **Em dashes leaked through.** Subagents kept producing em dashes (—) in the new AE LinkedIn output despite explicit bans, particularly in long-form messages with appositive clauses. The validator catches them; the prompt now includes em dashes in the BANNED LIST at the top, with examples of how to replace them (commas, periods, or hyphens).
 
-This spec fixes all six.
+7. **AE emails E5-E8 carried the same productized fingerprints across every record.** A May 2026 review of 4 AE email tiers (Simba, Etaily, TOA Global, Tristel) found 3 patterns repeated identically across every record: (a) email5's Solve section always used the tagline `"Finmo is treasury with payments built in, not bolted on"` followed by a feature comma-list; (b) email6 always opened with `"Something interesting/odd about [industry]:"` as a formal-essay setup; (c) email7 always closed with `"Both of these are things Finmo automates - plus [feature]. But the audit alone is worth doing regardless."` and email8's tease line always referenced a feature name. All four were rewritten to plain, peer-tone language and the templates updated. Banned: the tagline, the "Something interesting/odd about" opener, the "plus [feature]" closer plug, feature names in tease lines.
+
+This spec fixes all seven.
 
 ---
 
@@ -111,10 +113,10 @@ This is the canonical mapping. Follow it exactly. Every field has one formula, o
 | `custom_email2` | E2 BAB (Before-After-Bridge) | SDR | No opt-out |
 | `custom_email3` | E3 Referral / Right Person (social proof) | SDR | `Not relevant? Just say 'pass' - no hard feelings.` |
 | `custom_email4` | E4 Open Door (zero pressure) | SDR | Whole email IS the opt-out |
-| `email5_subject` + `email5_body` | E5 PAS (Problem-Agitate-Solve) | AE | `If I'm way off, reply 'pass' and I'll know.` |
-| `email6_subject` + `email6_body` | E6 Pattern Share (discovery) | AE | `If this isn't your world, just say so.` |
-| `email7_subject` + `email7_body` | E7 Relevant Question (2 free tips) | AE | Walkthrough ask is soft enough |
-| `email8_subject` + `email8_body` | E8 Up to You (zero pressure close) | AE | Ends with "no hard feelings" |
+| `email5_subject` + `email5_body` | E5 PAS (Problem-Agitate-Solve). **May 2026 update:** Solve section must NOT use the `"Finmo is treasury with payments built in, not bolted on"` tagline or feature comma-list. Use plain `"Finmo plugs into your existing banks, pulls cash positions into one view, and handles the FX and cross-border payouts at mid-market rates on top. Same banking setup, just visible from one place."` | AE | `If I'm way off, reply 'pass' and I'll know.` |
+| `email6_subject` + `email6_body` | E6 Pattern Share (discovery). **May 2026 update:** Opener must NOT use the `"Something interesting/odd about [industry]:"` setup phrase. State the observation directly. | AE | `If this isn't your world, just say so.` |
+| `email7_subject` + `email7_body` | E7 Relevant Question (2 free tips). **May 2026 update:** Closer must use `"Both of these are things we automate at Finmo, but the audit alone is worth doing regardless of what tool you use."` Drop the `"plus [feature]"` plug. | AE | Walkthrough ask is soft enough |
+| `email8_subject` + `email8_body` | E8 Up to You (zero pressure close). **May 2026 update:** Tease line must use plain-language reference to their situation (`"how this maps to your [specific situation]"`), NOT a feature name like `"how 13-week cash forecasting changes [X]"`. | AE | Ends with "no hard feelings" |
 | `email9_subject` + `email9_body` | E9 CEO Personal Reach-Out (< 80 words) | CEO | — |
 | `email10_subject` + `email10_body` | E10 CEO Value Drop (E10 subject must start `Re:` + E9 subject) | CEO | `No pressure either way.` |
 | `whatsapp_sdr_1` | SDR WA: awkwardness acknowledgment | SDR | — |
@@ -181,6 +183,8 @@ Full rules in [UNIFIED_OUTREACH_SEQUENCE.md](UNIFIED_OUTREACH_SEQUENCE.md). Fail
 
 - **No em dashes (`—`).** Use commas, periods, or hyphens (`-`). Em dashes are the single biggest AI tell. The validator should grep for `—` and reject any output that contains one.
 - **No "an AE at Finmo" phrasing.** When the AE introduces themselves, use `I'm {{sender_first_name}} {{sender_last_name}} from Finmo.` Drop the role title entirely. The earlier "an AE" phrasing read awkwardly and signaled template.
+- **No `"Finmo is treasury with payments built in, not bolted on"` tagline anywhere.** This exact phrasing repeated in every record's email5 across 100+ records, marking the entire AE tier as templated. In email5's Solve section, use plain `"Finmo plugs into your existing banks, pulls cash positions into one view, and handles the FX and cross-border payouts at mid-market rates on top. Same banking setup, just visible from one place."`
+- **No `"Something interesting/odd about [industry]:"` opener anywhere** (or any variant like `"[Industry] companies have an unusual treasury problem:"`). The formal-essay setup repeated in every record's email6. State the observation directly without a setup phrase.
 - **No emojis.**
 - **HTML:** `<br><br>` between paragraphs, never `<p>` tags.
 - **Banned words:** leverage, comprehensive, robust, seamless, cutting-edge, innovative, synergy, streamline, optimize, utilize, facilitate, enhance, foster, delve, excited to, it's worth noting.

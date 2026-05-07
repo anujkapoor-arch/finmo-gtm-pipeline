@@ -443,12 +443,12 @@ What's actually the toughest operational finance challenge on your plate right n
 
 ### Day 16: Email 5 - PAS (Problem-Agitate-Solve)
 
-*Pain-first. Structured sales argument. Frame the problem around the three-tool stack, not just FX. Solve with payments-led treasury.*
+*Pain-first. Structured sales argument. Frame the problem around the three-tool stack, not just FX. Solve with a plain "how it works" description.*
 
 **Structure:**
 1. **Problem:** Direct statement about their specific operational gap (managing three disconnected tools)
 2. **Agitate:** What that costs in time, money, or risk - be specific to their setup
-3. **Solve:** Finmo as treasury with payments built in - ONE capability, not a feature list
+3. **Solve:** Plain "how it works" - one concrete sentence about plugging into existing banks + one sentence reframing as additive
 4. **CTA:** Specific day/time ask
 
 **Template:**
@@ -461,14 +461,25 @@ Hi [First Name],<br><br>
 
 [Agitate: what that gap costs them specifically. Time, money, risk. Use their numbers/context.]<br><br>
 
-Finmo is treasury with payments built in, not bolted on. [One specific capability that maps to their pain - e.g., "One login, real-time cash positions across all entities, collections in 30+ currencies, payouts to 180+ countries, and mid-market FX."]<br><br>
+Finmo plugs into your existing banks, pulls cash positions into one view, and handles the FX and cross-border payouts at mid-market rates on top. Same banking setup, just visible from one place.<br><br>
 
 Worth 15 minutes to see if it fits [Company]'s setup?<br><br>
 
 If I'm way off, reply "pass" and I'll know.<br><br>
 
-{{sender_first_name}}
+Best,<br>
+{{sender_first_name}} {{sender_last_name}}
 ```
+
+**Working example (Solve section, May 2026 rewrite):**
+```
+Finmo plugs into your existing banks across AU, NZ, the US, and Asia, pulls cash positions into one view, and handles the FX and cross-border payouts at mid-market rates on top. Same banking setup, just visible from one place.
+```
+
+**Banned in this message (May 2026 rewrite):**
+- The tagline `"Finmo is treasury with payments built in, not bolted on"` - this exact phrasing repeated in every record's email5, marking the entire AE tier as templated.
+- The feature comma-list `"One login for real-time cash, collections in 30+ currencies, payouts to 180+ countries, and mid-market FX rates"` - reads as a website tagline. Replace with one plain sentence about HOW Finmo works (plugs into banks + adds FX/payouts on top).
+- Em dashes (`—`).
 
 ---
 
@@ -496,7 +507,7 @@ Subject: [observation hook, 3-4 words]
 
 Hi [First Name],<br><br>
 
-[One industry observation - something ironic, unexpected, or contrarian about their type of company and how they handle treasury/payments. NOT "I keep seeing..." or "One pattern that keeps coming up..." - just state the observation directly].<br><br>
+[Direct observation about their type of company - state it as a flat assertion, no setup phrase. E.g., "Most multi-country manufacturers I talk to have a sophisticated supply chain operation but a treasury setup that's still spreadsheets."]<br><br>
 
 [Connect it to their specific situation in one sentence].<br><br>
 
@@ -504,8 +515,13 @@ Does that ring true, or have you already sorted it internally?<br><br>
 
 If this isn't your world, just say so.<br><br>
 
-{{sender_first_name}}
+Best,<br>
+{{sender_first_name}} {{sender_last_name}}
 ```
+
+**Banned in this message (May 2026 rewrite):**
+- The opener pattern `"Something interesting/odd about [industry]: [observation]"` and its variants `"[Industry] companies have an unusual treasury problem:"` - this formal-essay rhythm appeared in every record's email6, marking it as templated. Drop the setup phrase. Just state the observation directly.
+- "I keep seeing", "One pattern that keeps coming up", "I've been talking to" - all banned openings.
 
 ---
 
@@ -627,12 +643,16 @@ Two things your finance team can do this week without buying anything:<br><br>
 
 2. [Second tip, different angle. Also actionable and free. E.g., "Time your payroll conversions. Shifting from reactive to planned conversions 3 days before payroll saves 0.5-1% per batch."]<br><br>
 
-Both of these are things Finmo automates - plus [one additional capability relevant to them: same-day payouts / collections in 30+ currencies / 13-week forecasting]. But the audit alone is worth doing regardless.<br><br>
+Both of these are things we automate at Finmo, but the audit alone is worth doing regardless of what tool you use.<br><br>
 
 Want help running the numbers? 15 minutes and I can walk you through it.<br><br>
 
-{{sender_first_name}}
+Best,<br>
+{{sender_first_name}} {{sender_last_name}}
 ```
+
+**Banned in this message (May 2026 rewrite):**
+- The closer pattern `"Both of these are things Finmo automates - plus [feature]. But the audit alone is worth doing regardless."` - the `"plus [feature]"` reads as a tacked-on plug after the value-first content. Replace with the version above (drops the feature mention, adds "regardless of what tool you use" so the value framing stays genuine).
 
 ---
 
@@ -658,10 +678,13 @@ Two things I noticed researching [lead's company]'s setup:<br><br>
 
 2. [Second observation, different angle, also with a number. Frame around the one-platform benefit.]<br><br>
 
-There's a third one around [related topic - e.g., "how 13-week cash forecasting changes the conversation with your board"], but I don't want to overwhelm you. If the first two are useful, want me to send the third?<br><br>
+There's a third one around [plain-language reference to their specific situation - e.g., "how this maps to your post-M&A integration timing" or "how this maps to your APAC and US growth conversation"], but I don't want to overwhelm you. If the first two are useful, want me to send the third?<br><br>
 
 If not, totally fine. No hard feelings.
 ```
+
+**Banned in this message (May 2026 rewrite):**
+- Feature names in the tease line. Phrases like `"how 13-week cash forecasting changes [X]"` or `"how automated multi-currency reconciliation does [Y]"` read as feature plugs. Replace with `"how this maps to your [specific situation]"` - reference their context, not a product feature.
 
 ---
 
